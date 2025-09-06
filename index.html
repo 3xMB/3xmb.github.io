@@ -68,6 +68,9 @@
     .line { white-space: pre-wrap; word-break: break-word; }
     .prompt { color: var(--accent); }
     .path { color: var(--muted); }
+    .caret { display: inline-block; width: 8px; height: 1.2em; vertical-align: -2px; background: var(--accent); animation: blink 1.1s steps(1) infinite; }
+
+    @keyframes blink { 50% { opacity: 0; } }
 
     .input-line { display: flex; align-items: baseline; gap: 8px; }
     input[type="text"] {
@@ -116,7 +119,9 @@
         <div class="badge">v1.0</div>
       </header>
 
-      <main id="screen" aria-live="polite" aria-label="terminal output"></main>
+      <main id="screen" aria-live="polite" aria-label="terminal output">
+        <!-- Boot banner injected by JS -->
+      </main>
 
       <footer>
         <span class="muted">Type</span>&nbsp;<span class="green">help</span>&nbsp;<span class="muted">to list commands •</span>
@@ -130,99 +135,82 @@
     // ======== CONFIG (edit these) ========
     const PROFILE = {
       handle: '3xMB',
-      name: 'Moh Bacha',
+      name: 'Muhammed Bacha',
       email: 'Admin@3xmb.com',
-      location: 'Saudi Arabia',
+      location: 'Egyptian living in Saudi Arabia',
       roles: ['Offensive Security Learner', 'CTF Enthusiast', 'Future Red Teamer'],
       socials: {
         GitHub: 'https://github.com/3xMB',
-        LinkedIn: 'https://www.linkedin.com/in/', // غيّر ده لصفحتك
+        LinkedIn: 'https://www.linkedin.com/public-profile/settings?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_self_edit_contact-info%3BlaXgmeUuRp%2B9We%2FfS0DGaA%3D%3D',
         TryHackMe: 'https://tryhackme.com/p/3xMB',
       },
+      // Add / edit your certs here
       certs: [
         { name: 'Google Cybersecurity Professional Certificate', issuer: 'Google', date: '2025', id: '' },
         { name: 'TryHackMe — Cybersecurity 101 Path', issuer: 'THM', date: '2025', id: '' },
-        { name: 'eJPT v2', issuer: 'INE/ElevenPaths', date: 'In Progress', id: '' },
+        // { name: 'eJPT v2', issuer: 'INE/ElevenPaths', date: 'In Progress', id: '' },
       ],
-      cv_url: '#', // ضع رابط PDF لو حابب
+      cv_url: '#', // put your CV link or PDF
       site: '3xmb.com'
     };
 
     // ======== Terminal Core ========
     const screen = document.getElementById('screen');
-    const STATE = { history: [], pointer: -1, path: '~/3xmb', booted: false };
+    const STATE = { history: [],
+                    pointer: -1,
+                    path: '~/3xmb',
+                    booted: false };
 
     const COMMANDS = {
       help() {
-        return block(
-`Available commands:
-
-about        — who is 3xMB?
-certs        — show certifications
-socials      — links & profiles
-contact      — email & CV
-banner       — show ASCII banner
-ls           — list sections
-whoami       — print current user
-clear        — clear the screen`
-        );
+        return block(`Available commands:\n\n` +
+          `about        — who is 3xMB?\n`+
+          `certs        — show certifications\n`+
+          `socials      — links & profiles\n`+
+          `contact      — email & CV\n`+
+          `banner       — show ASCII banner\n`+
+          `ls           — list sections\n`+
+          `whoami       — print current user\n`+
+          `clear        — clear the screen`);
       },
       banner() { return block(asciiArt()); },
       ls() { return line('about  certs  socials  contact'); },
-      whoami() { return line(\`\${PROFILE.handle.toLowerCase()}@\${PROFILE.site}\`); },
-
+      whoami() { return line(`${PROFILE.handle.toLowerCase()}@${PROFILE.site}`); },
       about() {
-        const roles = PROFILE.roles.map(r => \`<span class="badge">\${escapeHtml(r)}</span>\`).join(' ');
+        const roles = PROFILE.roles.map(r=>`<span class="badge">${escapeHtml(r)}</span>`).join(' ');
         return block(
-\`Hey, I'm \${PROFILE.name} (aka <span class="green">\${PROFILE.handle}</span>).
-
-I'm a cybersecurity learner who's deep into red teaming, CTFs, and building tooling.
-Right now I'm focusing on web app pentesting and methodical note-taking.
-
-\${roles}
-
-Arabic (مختصر):
-أنا محمد باشا (3xMB) 👨‍💻
-باحث في أمن المعلومات ومهتم بمجال الاختراق الأخلاقي والـ Red Teaming.
-بحب أتعلم من التحديات (CTFs) وأبني أدوات تساعدني أطور نفسي في الـ OffSec.
-خلصت شهادات أساسية زي Google Cybersecurity Certificate و Cybersecurity 101 من TryHackMe،
-وحاليًا ماشي في مسار eJPT → OSCP بإذن الله.
-
-هدفي إني أكون Red Teamer قوي وأساهم في رفع مستوى الأمان والهجوم الدفاعي في الشركات. 🚀\`
-        );
+`Hey, I\'m ${PROFILE.name} (aka <span class="green">${PROFILE.handle}</span>).\n\n`+
+`I\'m a cybersecurity learner who\'s deep into red teaming, CTFs, and building tooling.\n`+
+`Right now I\'m focusing on web app pentesting and methodical note-taking.\n\n`+
+`${roles}\n\n`+
+`Arabic (مختصر):\n`+
+`أنا ${PROFILE.name} — مهتم باختبار الاختراق و الـCTF وببني أدوات تساعدني أتعلم بعمق.\n`+
+`هتلاقي تحت الشهادات اللي خلصتها وروابط حساباتي، ولو محتاج تتواصل: \`${PROFILE.email}\``);
       },
-
       certs() {
         if (!PROFILE.certs.length) return line('No certifications added yet.');
-        const rows = PROFILE.certs
-          .map(c => \`• \${escapeHtml(c.name)} — \${escapeHtml(c.issuer)} (\${escapeHtml(c.date)})\`)
-          .join('\\n');
-        return block(\`Certifications (\${PROFILE.certs.length}):\\n\\n\${rows}\`);
+        const rows = PROFILE.certs.map(c => `• ${escapeHtml(c.name)} — ${escapeHtml(c.issuer)} (${escapeHtml(c.date)})`).join('\n');
+        return block(`Certifications (${PROFILE.certs.length}):\n\n${rows}`);
       },
-
       socials() {
         const links = Object.entries(PROFILE.socials)
-          .filter(([k, v]) => v && v !== '#')
-          .map(([k, v]) => \`• \${k}: <a href="\${v}" target="_blank" rel="noopener">\${v}</a>\`)
-          .join('\\n');
+          .filter(([k,v]) => v && v !== '#')
+          .map(([k,v]) => `• ${k}: <a href="${v}" target="_blank" rel="noopener">${v}</a>`)
+          .join('\n');
         return block(links || 'No socials added.');
       },
-
       contact() {
-        const cv = PROFILE.cv_url && PROFILE.cv_url !== '#'
-          ? \`\\nCV: <a href="\${PROFILE.cv_url}" target="_blank" rel="noopener">Download</a>\`
-          : '';
-        return block(\`Email: <a href="mailto:\${PROFILE.email}">\${PROFILE.email}</a>\${cv}\`);
+        const cv = PROFILE.cv_url && PROFILE.cv_url !== '#' ? `\nCV: <a href="${PROFILE.cv_url}" target="_blank" rel="noopener">Download</a>` : '';
+        return block(`Email: <a href="mailto:${PROFILE.email}">${PROFILE.email}</a>${cv}`);
       },
-
       clear() { screen.innerHTML = ''; return ''; },
     };
 
     // ==== helpers ====
-    function asciiArt() {
+    function asciiArt(){
       return `
 <span class="ascii">   ____  __  __ ____  
-  /___ \\/ / / /|___ \\ 
+  /___ \/ / / /|___ \ 
    ___) / /_/ /  __) |
   |__ <| '_  _| |__ < 
   ___) | | | | ___) | 
@@ -230,18 +218,18 @@ Arabic (مختصر):
  <span class="muted">3xMB • ${new Date().getFullYear()}</span>`;
     }
 
-    function boot() {
+    function boot(){
       print(line(asciiArt()));
-      print(block(\`Welcome to <span class="green">3xMB</span> interactive terminal. Type <span class="green">help</span> to get started.\`));
+      print(block(`Welcome to <span class="green">3xMB</span> interactive terminal. Type <span class="green">help</span> to get started.`));
       newline();
       prompt();
       STATE.booted = true;
     }
 
-    function prompt() {
+    function prompt(){
       const row = document.createElement('div');
       row.className = 'input-line';
-      row.innerHTML = \`<span class="prompt">\${PROFILE.handle.toLowerCase()}@\${PROFILE.site}</span>:<span class="path">\${STATE.path}</span>$\`;
+      row.innerHTML = `<span class="prompt">${PROFILE.handle.toLowerCase()}@${PROFILE.site}</span>:<span class="path">${STATE.path}</span>$`;
       const input = document.createElement('input');
       input.type = 'text';
       input.setAttribute('aria-label','terminal input');
@@ -249,60 +237,57 @@ Arabic (مختصر):
       screen.appendChild(row);
       focusInput(input);
 
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+      input.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){
           const val = input.value.trim();
           input.disabled = true; input.style.opacity = .9;
           run(val);
-        } else if (e.key === 'ArrowUp') {
+        } else if(e.key === 'ArrowUp'){
           e.preventDefault(); navigateHistory(-1, input);
-        } else if (e.key === 'ArrowDown') {
+        } else if(e.key === 'ArrowDown'){
           e.preventDefault(); navigateHistory(1, input);
         }
       });
       scrollToBottom();
     }
 
-    function run(cmd) {
+    function run(cmd){
       STATE.history.push(cmd); STATE.pointer = STATE.history.length;
       const [name, ...args] = cmd.split(/\s+/);
-      print(line(\`<span class="prompt">\${PROFILE.handle.toLowerCase()}@\${PROFILE.site}</span>:<span class="path">\${STATE.path}</span>$ \${escapeHtml(cmd)}\`));
-      const fn = COMMANDS[name?.toLowerCase()] || (() => line(\`command not found: \${escapeHtml(name || '')}. Try <span class='green'>help</span>\`));
+      print(line(`<span class="prompt">${PROFILE.handle.toLowerCase()}@${PROFILE.site}</span>:<span class="path">${STATE.path}</span>$ ${escapeHtml(cmd)}`));
+      const fn = COMMANDS[name?.toLowerCase()] || (()=> line(`command not found: ${escapeHtml(name||'')}. Try <span class='green'>help</span>`));
       const out = fn(args);
       if (out) print(out);
       newline();
       prompt();
     }
 
-    function navigateHistory(dir, input) {
-      if (!STATE.history.length) return;
+    function navigateHistory(dir, input){
+      if(!STATE.history.length) return;
       STATE.pointer = Math.max(0, Math.min(STATE.history.length, STATE.pointer + dir));
       input.value = STATE.history[STATE.pointer] || '';
-      setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
+      setTimeout(()=> input.setSelectionRange(input.value.length, input.value.length), 0);
     }
 
-    function line(html) {
+    function line(html){
       const el = document.createElement('div');
       el.className = 'line';
       el.innerHTML = html;
       return el;
     }
-
-    function block(html) {
+    function block(html){
       const el = document.createElement('div');
       el.className = 'line';
       el.innerHTML = html.replace(/\n/g, '<br/>');
       return el;
     }
+    function newline(){ screen.appendChild(document.createElement('div')); }
+    function print(el){ screen.appendChild(el); scrollToBottom(); }
+    function focusInput(input){ setTimeout(()=> input.focus(), 10); }
+    function scrollToBottom(){ screen.scrollTo({ top: screen.scrollHeight }); }
+    function escapeHtml(str){ return String(str).replace(/[&<>\"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
 
-    function newline() { screen.appendChild(document.createElement('div')); }
-    function print(el) { screen.appendChild(el); scrollToBottom(); }
-    function focusInput(input) { setTimeout(() => input.focus(), 10); }
-    function scrollToBottom() { screen.scrollTo({ top: screen.scrollHeight }); }
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-    }
-
+    // boot
     document.addEventListener('DOMContentLoaded', boot);
   </script>
 </body>
