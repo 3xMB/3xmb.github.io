@@ -8,366 +8,66 @@
   <meta property="og:title" content="3xMB • Terminal" />
   <meta property="og:description" content="3xMB | Moh Bacha — Cybersecurity terminal-style portfolio" />
   <meta name="theme-color" content="#00ff88" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23000000'/%3E%3Cpath d='M18 20l12 12-12 12M36 44h10' stroke='%2300FF88' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-  <style>
-    :root{
-      --bg:#0b0f0c; --bg2:#050706; --fg:#d4fbe2; --accent:#00ff88; --muted:#7ee2b8; --dim:#3b6d57; --shadow:rgba(0,0,0,.5);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:radial-gradient(1200px 800px at 20% -10%, #0f261a 0%, var(--bg) 40%, var(--bg2) 100%);
-      color:var(--fg); font:15px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing:.2px; overflow:hidden;
-    }
-    .crt{position:fixed; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0, rgba(0,0,0,.35) 1px, rgba(0,0,0,.3) 2px, rgba(0,0,0,.3) 3px); mix-blend-mode:overlay; opacity:.4}
-    .wrap{height:100%; display:grid; grid-template-rows:auto 1fr auto}
-    header{display:flex; align-items:center; gap:10px; padding:14px 16px; background:linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,0)); border-bottom:1px solid #0f2a1d}
-    .lamp{width:10px; height:10px; border-radius:50%; background:#133; box-shadow:0 0 0 2px #041, 0 0 10px 1px var(--accent)}
-    .title{color:var(--muted); font-weight:600}
-    .flex{flex:1}
-    .theme-btn{border:1px solid var(--dim); background:transparent; color:var(--fg); padding:6px 10px; border-radius:999px; cursor:pointer; transition:transform .12s ease}
-    .theme-btn:hover{transform:translateY(-1px); border-color:var(--accent)}
-    .badge{display:inline-block; padding:2px 8px; border:1px solid var(--dim); border-radius:999px; margin-left:6px}
 
-    main{padding:16px; height:100%; overflow:auto; scrollbar-width:thin; scrollbar-color:var(--dim) transparent}
-    main::-webkit-scrollbar{width:10px}
-    main::-webkit-scrollbar-track{background:transparent}
-    main::-webkit-scrollbar-thumb{background:linear-gradient(180deg, var(--dim), var(--accent)); border-radius:10px; border:2px solid transparent; background-clip:padding-box}
-    main::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg, var(--accent), var(--dim))}
+  <!-- Favicon -->
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23000000'/%3E%3Cpath d='M18 20l12 12-12 12M36 44h10' stroke='%2300FF88' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 
-    .line{white-space:pre-wrap; word-break:break-word}
-    .prompt{color:var(--accent)}
-    .path{color:var(--muted)}
-    .typing{display:inline-block; position:relative}
-    .typing::after{content:"▌"; display:inline-block; margin-left:2px; animation:caret 1.05s steps(1) infinite; color:var(--accent)}
-    @keyframes caret{50%{opacity:0}}
+  <!-- CSS will be added in Part 2 -->
+  <link rel="stylesheet" href="style.css" />
 
-    .input-line{display:flex; align-items:baseline; gap:8px}
-    input[type=text]{background:transparent; border:none; outline:none; color:var(--fg); flex:1; font:inherit}
-
-    .muted{color:var(--dim)} .green{color:var(--accent)}
-    footer{display:flex; align-items:center; gap:10px; padding:10px 16px; border-top:1px solid #0f2a1d; background:linear-gradient(0deg, rgba(0,0,0,.5), rgba(0,0,0,0)); color:var(--muted); font-size:12px}
-    .window{max-width:1100px; margin:0 auto; height:calc(100vh - 0px); border-radius:14px; box-shadow:0 8px 40px var(--shadow); border:1px solid #0c2018; background:rgba(0,0,0,.25); backdrop-filter:blur(8px); overflow:hidden}
-
-    a{color:var(--accent); text-decoration:none; border-bottom:1px dotted var(--dim)}
-    a:hover{border-color:var(--accent)}
-    .ascii{color:var(--accent)}
-    @media (max-width:640px){header,main,footer{padding-inline:10px}}
-  </style>
-
-  <!-- Analytics -->
-  <script defer data-domain="3xmb.com" src="https://plausible.io/js/script.js"></script>
-  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-D6XZPMDWBQ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-D6XZPMDWBQ');
-  </script>
 </head>
 <body>
-  <div class="wrap">
+
+  <!-- MATRIX RAIN BACKGROUND -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="login-overlay">
+    <div class="login-panel">
+      <h2 class="login-title">Welcome to <span class="green">3xMB</span> Secure Console</h2>
+      <p class="login-sub">Identify yourself to begin the session.</p>
+
+            <input type="text" id="login-input" class="login-input"
+             autocomplete="off" placeholder="Enter username..." />
+
+      <p class="login-hint">Press Enter to continue</p>
+      <p id="login-error" class="login-error">Invalid input, try again.</p>
+
+      <!-- Login cinematic log -->
+      <div id="login-log" class="login-log"></div>
+    </div>
+  </div>
+
+
+  <!-- TERMINAL -->
+  <div class="wrap" id="terminal-wrap" style="display:none;">
     <div class="window">
+
       <header>
         <div class="lamp"></div>
         <div class="title">3xMB Terminal</div>
         <div class="flex"></div>
-        <button class="theme-btn" id="themeBtn" title="Cycle theme">🎨 Theme</button>
+        <button id="themeBtn" class="theme-btn">🎨 Theme</button>
         <div class="badge" id="themeName">matrix</div>
       </header>
 
-      <main id="screen" aria-live="polite" aria-label="terminal output"></main>
+      <main id="screen"></main>
 
       <footer>
-        <span class="muted">Type</span>&nbsp;<span class="green">help</span>&nbsp;<span class="muted">to list commands •</span>
-        <span class="muted">Press</span>&nbsp;<span class="green">↑/↓</span>&nbsp;<span class="muted">for history •</span>
-        <span class="muted">Theme:</span>&nbsp;<span class="green" id="themeHint">theme list</span>
+        <span class="muted">Type</span>
+        <span class="green">help</span>
+        <span class="muted">to list commands • Press</span>
+        <span class="green">↑/↓</span>
+        <span class="muted">for history</span>
       </footer>
+
     </div>
   </div>
-  <div class="crt" aria-hidden="true"></div>
 
-  <script>
-  (function(){
-    "use strict";
+  <!-- JS (will be added in Part 3 & 4) -->
+  <script src="matrix.js"></script>
+  <script src="terminal.js"></script>
 
-    /* ===== CONFIG ===== */
-    var PROFILE = {
-      handle:'3xMB',
-      name:'Moh Bacha',
-      email:'Admin@3xmb.com',
-      location:'Saudi Arabia',
-      roles:['Offensive Security Learner','CTF Enthusiast','Future Red Teamer'],
-      socials:{ GitHub:'https://github.com/3xMB', LinkedIn:'https://www.linkedin.com/in/muhammed-bacha-8674b922a/', TryHackMe:'https://tryhackme.com/p/3xMB' },
-      certs:[
-        { name:'Google Cybersecurity Professional Certificate', issuer:'Google', date:'2025' },
-        { name:'TryHackMe — Cybersecurity 101 Path', issuer:'THM', date:'2025' },
-        { name:'eJPT v2', issuer:'INE/ElevenPaths', date:'In Progress' }
-      ],
-      cv_url:'#',
-      site:'3xmb.com'
-    };
-
-    /* ===== THEMES ===== */
-    var THEMES = {
-      matrix:{accent:'#00ff88', muted:'#7ee2b8', dim:'#2b6d57', bg:'#0b0f0c', bg2:'#050706'},
-      neon:{accent:'#00e5ff', muted:'#9beaff', dim:'#2a6570', bg:'#07131a', bg2:'#01070a'},
-      lava:{accent:'#ff7a00', muted:'#ffd0a6', dim:'#7a4a24', bg:'#120a07', bg2:'#070200'},
-      violet:{accent:'#b488ff', muted:'#dec8ff', dim:'#644d8a', bg:'#0d0a12', bg2:'#05040a'},
-      cyberred:{accent:'#ff3b3b', muted:'#ffb3b3', dim:'#7a2d2d', bg:'#120707', bg2:'#070202'}
-    };
-    var THEME_ORDER = Object.keys(THEMES);
-
-    /* ===== CORE HANDLES ===== */
-    var screen = document.getElementById('screen');
-    var themeBtn = document.getElementById('themeBtn');
-    var themeNameBadge = document.getElementById('themeName');
-
-    var STATE = {
-      history:[], pointer:-1, path:'~/3xmb', booted:false,
-      typing:true, typingMsPerChar:8, typingMaxDelay:900
-    };
-
-    /* ===== COMMANDS ===== */
-    var COMMANDS = {
-      help: function(){
-        return block(
-          [
-            'Available commands:',
-            '',
-            'about        — who is 3xMB?',
-            'certs        — show certifications',
-            'skills       — hacking & tech stack',
-            'socials      — links & profiles',
-            'contact      — email & CV',
-            'banner       — show ASCII banner',
-            'ls           — list sections',
-            'whoami       — print current user',
-            'theme        — theme list | theme <name>',
-            'clear        — clear the screen'
-          ].join('\n')
-        );
-      },
-
-      banner: function(){ return block(asciiArt()); },
-      ls: function(){ return line('about  certs  skills  socials  contact'); },
-      whoami: function(){ return line(PROFILE.handle.toLowerCase() + '@' + PROFILE.site); },
-
-      about: function(){
-        var roles = PROFILE.roles.map(function(r){ return '<span class="badge">'+escapeHtml(r)+'</span>'; }).join(' ');
-        return block(
-          "Hey, I'm " + PROFILE.name + " (aka <span class=\"green\">" + PROFILE.handle + "</span>)." + "\n\n" +
-          "I'm a cybersecurity learner who's deep into red teaming, CTFs, and building tooling." + "\n" +
-          "Right now I'm focusing on web app pentesting and methodical note-taking." + "\n\n" +
-          roles + "\n\n" +
-          "Arabic (مختصر):" + "\n" +
-          "أنا محمد باشا (3xMB) 👨‍💻" + "\n" +
-          "باحث في أمن المعلومات ومهتم بمجال الاختراق الأخلاقي والـ Red Teaming." + "\n" +
-          "بحب أتعلم من التحديات (CTFs) وأبني أدوات تساعدني أطور نفسي في الـ OffSec." + "\n" +
-          "خلصت شهادات أساسية زي Google Cybersecurity Certificate و Cybersecurity 101 من TryHackMe،" + "\n" +
-          "وحاليًا ماشي في مسار eJPT → OSCP بإذن الله." + "\n\n" +
-          "هدفي إني أكون Red Teamer قوي وأساهم في رفع مستوى الأمان والهجوم الدفاعي في الشركات. 🚀"
-        );
-      },
-
-      skills: function(){
-        return block(
-          [
-            'Technical Skills:',
-            '',
-            '• Networking (TCP/IP, DNS, DHCP, VPN, Firewalls)',
-            '• OSINT & Information Gathering',
-            '• Nmap, Gobuster, Nikto',
-            '• Metasploit Framework',
-            '• Python & Bash scripting',
-            '• HTML, CSS, JavaScript basics',
-            '• Web Exploitation (LFI, RFI, XSS, CSRF, File Upload)',
-            '• SQL Injection & DB Attacks',
-            '• Host-based Attacks & Privilege Escalation (Linux/Windows)',
-            '• Active Directory attacks',
-            '• Burp Suite Professional',
-            '• Wireshark & Packet Analysis',
-            '• Password Attacks (hashcat, john)',
-            '• Enumeration (SMB, FTP, SSH, SNMP)',
-            '• Exploit Development (basic buffer overflows)'
-          ].join('\n')
-        );
-      },
-
-      certs: function(){
-        if(!PROFILE.certs.length) return line('No certifications added yet.');
-        var rows = PROFILE.certs.map(function(c){
-          return '• ' + escapeHtml(c.name) + ' — ' + escapeHtml(c.issuer) + ' (' + escapeHtml(c.date) + ')';
-        }).join('\n');
-        return block('Certifications (' + PROFILE.certs.length + '):\n\n' + rows);
-      },
-
-      socials: function(){
-        var pairs = Object.entries(PROFILE.socials).filter(function(arr){ return arr[1] && arr[1] !== '#'; });
-        var links = pairs.map(function(arr){ return '• ' + arr[0] + ': <a href="' + arr[1] + '" target="_blank" rel="noopener">' + arr[1] + '</a>'; }).join('\n');
-        return block(links || 'No socials added.');
-      },
-
-      contact: function(){
-        var cv = (PROFILE.cv_url && PROFILE.cv_url !== '#') ? '\nCV: <a href="'+PROFILE.cv_url+'" target="_blank" rel="noopener">Download</a>' : '';
-        return block('Email: <a href="mailto:'+PROFILE.email+'">'+PROFILE.email+'</a>' + cv);
-      },
-
-      theme: function(args){
-        args = args || [];
-        var sub = (args[0] || '').toLowerCase();
-        if(!sub || sub === 'list'){
-          var names = THEME_ORDER.map(function(n){ return n === currentTheme() ? '['+n+']' : n; }).join('  ');
-          return block('Themes: ' + names + '\nUse: theme &lt;name&gt;');
-        }
-        if(!THEMES[sub]) return line('Unknown theme: ' + escapeHtml(sub));
-        applyTheme(sub, true);
-        return line('Theme set to ' + sub);
-      },
-
-      clear: function(){ screen.innerHTML = ''; return ''; }
-    };
-
-    /* ===== HELPERS ===== */
-    function asciiArt(){
-      var y = (new Date()).getFullYear();
-      return (
-        '<span class="ascii">' +
-        '   ____  __  __ ____  ' + '\n' +
-        '  /___ \\/ / / /|___ \\\\ ' + '\n' +
-        '   ___) / /_/ /  __) |' + '\n' +
-        '  |__ <| \\' + '_  _| |__ < ' + '\n' +
-        '  ___) | | | | ___) | ' + '\n' +
-        ' |____/|_| |_||____/  </span>' + '\n' +
-        ' <span class="muted">3xMB • ' + y + '</span>'
-      );
-    }
-
-    function boot(){
-      var saved = localStorage.getItem('3xmb_theme') || 'matrix';
-      applyTheme(saved, false);
-      print(line(asciiArt()));
-      print(block('Welcome to <span class="green">3xMB</span> interactive terminal. Type <span class="green">help</span> to get started.'));
-      newline();
-      prompt();
-      STATE.booted = true;
-    }
-
-    function prompt(){
-      var row = document.createElement('div');
-      row.className = 'input-line';
-      row.innerHTML = '<span class="prompt">'+PROFILE.handle.toLowerCase()+'@'+PROFILE.site+'</span>:<span class="path">'+STATE.path+'</span>$';
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.setAttribute('aria-label','terminal input');
-      row.appendChild(input);
-      screen.appendChild(row);
-      focusInput(input);
-
-      input.addEventListener('keydown', function(e){
-        if(e.key === 'Enter'){
-          var val = input.value.trim();
-          input.disabled = true; input.style.opacity = .9;
-          run(val);
-        } else if(e.key === 'ArrowUp'){
-          e.preventDefault(); navigateHistory(-1, input);
-        } else if(e.key === 'ArrowDown'){
-          e.preventDefault(); navigateHistory(1, input);
-        }
-      });
-      scrollToBottom();
-    }
-
-    function run(cmd){
-      STATE.history.push(cmd); STATE.pointer = STATE.history.length;
-      var parts = cmd.split(/\s+/);
-      var name = (parts[0] || '').toLowerCase();
-      var args = parts.slice(1);
-      print(line('<span class="prompt">'+PROFILE.handle.toLowerCase()+'@'+PROFILE.site+'</span>:<span class="path">'+STATE.path+'</span>$ ' + escapeHtml(cmd)), false);
-      var fn = COMMANDS[name] || function(){ return line('command not found: ' + escapeHtml(name || '') + '. Try <span class=\'green\'>help</span>'); };
-      var out = fn(args);
-      if(out) print(out, true);
-      newline();
-      prompt();
-    }
-
-    function navigateHistory(dir, input){
-      if(!STATE.history.length) return;
-      STATE.pointer = Math.max(0, Math.min(STATE.history.length, STATE.pointer + dir));
-      input.value = STATE.history[STATE.pointer] || '';
-      setTimeout(function(){ input.setSelectionRange(input.value.length, input.value.length); }, 0);
-    }
-
-    function line(html){
-      var el = document.createElement('div');
-      el.className = 'line';
-      el.innerHTML = html;
-      return el;
-    }
-    function block(html){
-      var el = document.createElement('div');
-      el.className = 'line';
-      el.innerHTML = html.replace(/\n/g, '<br/>');
-      return el;
-    }
-    function newline(){ screen.appendChild(document.createElement('div')); }
-    function focusInput(input){ setTimeout(function(){ input.focus(); }, 10); }
-    function scrollToBottom(){ screen.scrollTo({ top: screen.scrollHeight }); }
-    function escapeHtml(str){
-      return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]); });
-    }
-
-    /* ===== Typing effect ===== */
-    function textLengthFromHTML(html){
-      var tmp = document.createElement('div');
-      tmp.innerHTML = html.replace(/\n/g, ' ');
-      return (tmp.textContent || '').length;
-    }
-    function print(el, withTyping){
-      withTyping = !!withTyping && STATE.typing;
-      if(!withTyping){ screen.appendChild(el); scrollToBottom(); return; }
-      var holder = document.createElement('div');
-      var len = textLengthFromHTML(el.innerHTML);
-      var delay = Math.min(STATE.typingMaxDelay, Math.max(250, len * STATE.typingMsPerChar));
-      holder.className = 'line';
-      holder.innerHTML = '<span class="typing">…</span>';
-      screen.appendChild(holder);
-      scrollToBottom();
-      setTimeout(function(){ holder.replaceWith(el); scrollToBottom(); }, delay);
-    }
-
-    /* ===== Theme switching ===== */
-    function currentTheme(){ return localStorage.getItem('3xmb_theme') || 'matrix'; }
-    function applyTheme(name, persist){
-      if(persist === void 0) persist = true;
-      var t = THEMES[name] || THEMES.matrix;
-      document.documentElement.style.setProperty('--accent', t.accent);
-      document.documentElement.style.setProperty('--muted', t.muted);
-      document.documentElement.style.setProperty('--dim', t.dim);
-      document.documentElement.style.setProperty('--bg', t.bg);
-      document.documentElement.style.setProperty('--bg2', t.bg2);
-      document.body.style.background = 'radial-gradient(1200px 800px at 20% -10%, ' + shade(t.accent, -70) + ' 0%, var(--bg) 40%, var(--bg2) 100%)';
-      if(themeNameBadge) themeNameBadge.textContent = name;
-      if(persist) localStorage.setItem('3xmb_theme', name);
-    }
-    function shade(hex, amt){
-      var f = parseInt(hex.slice(1),16), t = amt<0?0:255, p = Math.abs(amt)/100;
-      var R = f>>16, G = f>>8&255, B = f&255;
-      return "#" + (0x1000000 + (Math.round((t-R)*p)+R)*0x10000 + (Math.round((t-G)*p)+G)*0x100 + (Math.round((t-B)*p)+B)).toString(16).slice(1);
-    }
-
-    if(themeBtn){
-      themeBtn.addEventListener('click', function(){
-        var cur = currentTheme();
-        var idx = THEME_ORDER.indexOf(cur);
-        var next = THEME_ORDER[(idx+1) % THEME_ORDER.length];
-        applyTheme(next, true);
-        print(line('Theme set to ' + next), true);
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', boot);
-  })();
-  </script>
 </body>
 </html>
