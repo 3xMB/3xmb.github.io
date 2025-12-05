@@ -1,0 +1,351 @@
+/* ===========================
+   GENERAL PAGE THEME
+   =========================== */
+:root {
+  --bg: #0b0f0c;
+  --bg2: #050706;
+  --fg: #d4fbe2;
+  --accent: #00ff88;
+  --muted: #7ee2b8;
+  --dim: #3b6d57;
+  --glow: 0 0 8px rgba(0,255,136,0.4);
+  --matrix-color: #00ff88;
+}
+
+
+/* RESET */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: black;
+  overflow: hidden;
+  font-family: ui-monospace, monospace;
+  color: var(--fg);
+  transition: background 0.5s ease-out, color 0.4s ease-out;
+}
+
+
+
+/* ===========================
+    MATRIX RAIN BACKGROUND
+   =========================== */
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: black;
+}
+
+
+/* ===========================
+    LOGIN OVERLAY (A2 style)
+   =========================== */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 1;
+  transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+}
+
+.login-overlay.login-fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.login-panel {
+  width: 360px;
+  background: rgba(0,0,0,0.75);
+  border: 1px solid var(--dim);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 0 25px rgba(0,255,136,0.15);
+}
+
+.login-title {
+  font-size: 20px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.login-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #0a1410;
+  border: 1px solid var(--dim);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--fg);
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(0,255,136,0.35);
+}
+
+.login-hint {
+  color: var(--dim);
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.login-error {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #ff4d4d;
+  display: none;
+}
+
+.login-log {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: inherit;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.login-log-line {
+  white-space: pre;
+}
+
+
+/* ===========================
+      TERMINAL WINDOW
+   =========================== */
+.wrap {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.window {
+  width: 90%;
+  max-width: 1100px;
+  height: 100%;
+  margin: 0 auto;
+  border-radius: 12px;
+  border: 1px solid var(--dim);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 35px rgba(0,0,0,0.6);
+  overflow: hidden;
+  transition:
+    background 0.4s ease-out,
+    border-color 0.4s ease-out,
+    box-shadow 0.4s ease-out,
+    transform 0.3s ease-out;
+}
+
+
+
+/* ===========================
+      TERMINAL HEADER
+   =========================== */
+header {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  gap: 10px;
+  border-bottom: 1px solid #0f2a1d;
+  background: rgba(0,0,0,0.4);
+}
+
+.lamp {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #133;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.title {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* flex spacer in header */
+.flex {
+  flex: 1;
+}
+
+.theme-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--dim);
+  color: var(--fg);
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.theme-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+
+/* ===========================
+        TERMINAL BODY
+   =========================== */
+main#screen {
+  padding: 18px;
+  overflow-y: auto;
+  height: calc(100vh - 130px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim) transparent;
+}
+
+main#screen::-webkit-scrollbar {
+  width: 10px;
+}
+main#screen::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--dim), var(--accent));
+  border-radius: 10px;
+}
+
+.line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 2px;
+}
+
+.prompt {
+  color: var(--accent);
+}
+
+.path {
+  color: var(--muted);
+}
+
+.badge {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(0,255,136,0.12);
+  border: 1px solid var(--dim);
+  color: var(--accent);
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+
+/* ===========================
+      TERMINAL FOOTER
+   =========================== */
+footer {
+  padding: 10px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid #0f2a1d;
+  background: rgba(0,0,0,0.3);
+}
+
+
+/* TEXT COLORS */
+.green { color: var(--accent); }
+.muted { color: var(--dim); }
+.ascii { color: var(--accent); }
+
+/* typing cursor (لو حابب تستخدمه في الـtyping effect) */
+.typing {
+  display: inline-block;
+}
+
+
+/* TERMINAL INPUT — FIXED VERSION (NO FREEZE) */
+.input-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cursor-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.input-line input[type="text"] {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--fg);
+    font: inherit;
+    padding: 0;
+    margin: 0;
+    caret-color: transparent !important; /* نخفي الكارِت */
+    width: auto;
+    min-width: 5px;
+}
+
+/* حطّينا الكارِت فوق الـinput */
+.block-cursor {
+    position: absolute;
+    right: -2px;    /* مهم جداً */
+    width: 9px;
+    height: 17px;
+    background: var(--accent);
+    animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-edit {
+  display: inline-block;
+  min-width: 5px;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  white-space: nowrap;
+  caret-color: transparent; /* نخفي الكارِت الحقيقي */
+}
+
+.block-cursor {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  background: var(--accent);
+  animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.line,
+.prompt,
+.path {
+  text-shadow: var(--glow);
+  transition: color 0.4s ease-out, text-shadow 0.4s ease-out;
+}
+
+
+body.theme-switching .window {
+  transform: scale(1.01);
+  box-shadow:
+    0 0 45px rgba(0,0,0,0.9),
+    0 0 30px var(--accent);
+}
