@@ -148,7 +148,106 @@
                   `, 'error');
               }
           }
+ // ==========================================
+  // TEST: Check Credentials Header
+  // ==========================================
+  async function testCredentials() {
+      clearResults();
+      log('<h3>Test: Credentials Header Check</h3>', 'info');
 
+      try {
+          // Method 1: XMLHttpRequest (sync for header access)
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', TARGET_API + '/', false);
+          xhr.setRequestHeader('Origin', 'https://evil.com');
+          xhr.withCredentials = true;  // Important: tells browser to send cookies
+          xhr.send();
+
+          const allowOrigin = xhr.getResponseHeader('access-control-allow-origin');
+          const allowCredentials = xhr.getResponseHeader('access-control-allow-credentials');
+
+          let severity = 'info';
+          let message = '';
+
+          if (allowCredentials === 'true') {
+              severity = 'error';
+              message = `
+                  <span style="color: red; font-size: 18px;">
+                  ⚠️ CRITICAL: Access-Control-Allow-Credentials: true
+                  </span><br><br>
+                  <strong>This means:</strong><br>
+                  - Cookies CAN be sent cross-origin<br>
+                  - Session hijacking possible<br>
+                  - Severity: HIGH TO CRITICAL<br>
+                  - Impact: Full account takeover possible
+              `;
+          } else {
+              message = `
+                  <strong>Access-Control-Allow-Credentials:</strong> ${allowCredentials || 'NOT SET'}<br><br>
+                  <strong>This means:</strong><br>
+                  - Cookies are NOT sent cross-origin<br>
+                  - Token theft required for exploitation<br>
+                  - Severity: MEDIUM
+              `;
+          }
+
+          log(`
+              <strong>Access-Control-Allow-Origin:</strong> ${allowOrigin}<br>
+              <strong>Access-Control-Allow-Credentials:</strong> ${allowCredentials || 'NOT SET'}<br>
+              ${message}
+          `, severity);
+
+      } catch (error) {
+          log(`<strong>Trying fetch method...</strong>`, 'info');
+
+          // Method 2: Fetch with credentials
+          try {
+              const response = await fetch(TARGET_API + '/', {
+                  method: 'GET',
+                  credentials: 'include',  // Send cookies
+                  headers: {
+                      'Origin': 'https://evil.com'
+                  }
+              });
+
+              const credsHeader = response.headers.get('access-control-allow-credentials');
+
+              if (credsHeader === 'true') {
+                  log(`
+                      <span style="color: red; font-size: 20px;">
+                      🔴 CRITICAL VULNERABILITY!
+                      </span><br><br>
+                      <strong>Access-Control-Allow-Credentials: true</strong><br>
+                      + <strong>Access-Control-Allow-Origin: *</strong><br><br>
+                      This combination allows ANY website to:<br>
+                      1. Access authenticated endpoints<br>
+                      2. Steal session cookies<br>
+                      3. Perform actions as the user<br><br>
+                      <strong>Severity: HIGH/CRITICAL</strong>
+                  `, 'error');
+              } else {
+                  log(`
+                      <strong>Access-Control-Allow-Credentials:</strong> NOT SET<br>
+                      <strong>Good news:</strong> Cookies won't be sent cross-origin.<br>
+                      <strong>Bad news:</strong> Still vulnerable to token-based attacks.
+                  `, 'success');
+              }
+
+          } catch (e) {
+              log(`
+                  <strong>Browser security blocked the request</strong><br>
+                  Check browser DevTools (F12) Network tab to see actual headers.
+              `, 'info');
+          }
+      }
+  }
+
+  Then add this button to your HTML:
+
+  <h3>6. Check Credentials Header (CRITICAL TEST)</h3>
+  <button onclick="testCredentials()" style="background: #ff0000; font-weight: bold;">
+      ⚠️ Check for Credentials Header
+  </button>
           // ==========================================
           // TEST 2: API Endpoint Enumeration
           // ==========================================
